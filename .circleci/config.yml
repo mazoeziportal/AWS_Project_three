@@ -78,12 +78,11 @@ jobs:
           command: |
             cd frontend
             npm install
-          
             npm audit --audit-level=critical
 
   scan-backend:
     docker:
-      - circleci/node:13.8.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -93,7 +92,6 @@ jobs:
           command: |
              cd backend
              npm install
-           
              npm audit --audit-level=critical
 
 
