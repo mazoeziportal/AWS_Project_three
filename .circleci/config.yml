@@ -8,7 +8,8 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-              aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:07}
+            
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:07}
                        
 
 jobs:
@@ -119,12 +120,12 @@ jobs:
               yum -y install tar gzip
 
       #- run:
-         # name: Ensure back-end infrastructure exists
+          #name: Ensure back-end infrastructure exists
           #command: |
             #aws cloudformation deploy \
               #--template-file .circleci/files/backend.yml \
               #--stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:07}" \
-              #--parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \ 
+              #--parameter-overrides "ID=${CIRCLE_WORKFLOW_ID:0:7}"  \ 
               #--tags project=udapeople
               
       - run:
@@ -133,7 +134,7 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:07}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \ 
+              --parameter-overrides "ID=${CIRCLE_WORKFLOW_ID:0:7}"  \ 
               --tags project=udapeople
           
       #- run:
