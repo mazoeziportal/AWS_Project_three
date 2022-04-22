@@ -1,5 +1,17 @@
 version: 2.1
 
+commands:
+  destroy-environment:
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.  
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:07}
+                       
+
 jobs:
   build-frontend:
     docker:
@@ -97,8 +109,47 @@ jobs:
              npm audit fix --audit-level=critical --force
              npm audit --audit-level=critical
 
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: 
+          name: Install tar and gzip
+          command: |
+              yum -y install tar gzip
 
+      #- run:
+          #name: Ensure back-end infrastructure exists
+          #command: |
+            #aws cloudformation deploy \
+              #--template-file .circleci/files/backend.yml \
+              #--stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:07}" \
+              #--parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \ 
+              #--tags project=udapeople
+              
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:07}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \ 
+              --tags project=udapeople
+          
+      #- run:
+          #name: Add back-end ip to ansible inventory
+          #command: |
+            #aws ec2 describe-instances \
+              #--query 'Reservations[*].Instances[*].PublicIpAddress' \
+              #--output text >> inventory
+            
+      #- persist_to_workspace:
+          #root: ~/
+          #paths:
+            #- project/.circleci/ansible/inventory.txt
   
+
 workflows:
   default:
     jobs:
@@ -112,3 +163,8 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [test-feature-branch]
