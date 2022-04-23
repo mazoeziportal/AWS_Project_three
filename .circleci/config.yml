@@ -135,8 +135,8 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
-              --stack-name udapeople-frontend-udapeople-fh1m246plxqqrs728 \
-              --parameter-overrides ID=udapeople-fh1m246plxqqrs728 \
+              --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
               --tags project=udapeople
             
               
@@ -154,9 +154,9 @@ jobs:
           #root: ~/
           #paths:
             #- project/.circleci/ansible/inventory.txt
-
-            #--stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-            #--parameter-overrides ID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \ 
+            #--stack-name udapeople-frontend-udapeople-fh1m246plxqqrs728 \
+            #--parameter-overrides ID=udapeople-fh1m246plxqqrs728 \
+            
 
 workflows:
   default:
