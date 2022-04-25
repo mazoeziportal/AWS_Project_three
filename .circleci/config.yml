@@ -163,21 +163,14 @@ jobs:
           fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
       - attach_workspace:
           at: ~/
-      
-      
-      
-      
-#       - run: cat ~/inventory.txt
-
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # Your code here
-#             apk add --update ansible
-#             yum -y install tar gzip
-#             apk add --update tar 
-#             apk add --update gzip
-#             pip install awscli
+       
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+            apk add --update tar 
+            apk add --update gzip
+            pip install awscli
 
 #             - run: yum -y install tar gzip
 #             exit 1
@@ -216,3 +209,5 @@ workflows:
             #--stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
             #--parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \ 
             #--parameter-overrides ID=udapeople-fh1m246plxqqrs728  \ 
+            #       - run: cat ~/inventory.txt
+            #yum -y install tar gzip
