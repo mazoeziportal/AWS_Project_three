@@ -8,10 +8,9 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            echo "Destroying environment: << parameters.workflow_id >> "
-            aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.workflow_id>>
-            aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.workflow_id>>
- 
+            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:07}
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+            
                        
 
 jobs:
@@ -227,3 +226,7 @@ workflows:
 # aws s3 rm s3://udapeople-<< parameters.workflow_id >> --recursive
  #          aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:07}
  #           aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+ #echo "Destroying environment: << parameters.workflow_id >> "
+ #           aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.workflow_id>>
+ #           aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.workflow_id>>
+ 
