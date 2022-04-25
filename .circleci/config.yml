@@ -292,10 +292,10 @@ workflows:
 #           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 #  #             
 #  #      --parameter-overrides ID=udapeople-fh1m246plxqqrs728 \
-cd .circleci/files
-aws cloudformation deploy \
-         --template-file cloudfront.yml \
-         --stack-name InitialStack\
-         --parameter-overrides WorkflowID=
+# cd .circleci/files
+# aws cloudformation deploy \
+#          --template-file cloudfront.yml \
+#          --stack-name InitialStack\
+#          --parameter-overrides WorkflowID=
           
  
