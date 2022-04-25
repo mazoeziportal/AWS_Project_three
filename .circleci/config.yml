@@ -1,15 +1,15 @@
 version: 2.1
 
-commands:
-  destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.  
-    steps:
-      - run:
-          name: Destroy environments
-          when: on_fail
-          command: |
-            #aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:07}
-            #aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+# commands:
+#   destroy-environment:
+#     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.  
+#     steps:
+#       - run:
+#           name: Destroy environments
+#           when: on_fail
+#           command: |
+#             #aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:07}
+#             #aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
                        
 
 jobs:
@@ -109,80 +109,79 @@ jobs:
              npm audit fix --audit-level=critical --force
              npm audit --audit-level=critical
 
-  # deploy-infrastructure:
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout
-  #     - run: 
-  #         name: Install tar and gzip
-  #         command: |
-  #             yum -y install tar 
-  #             yum -y install gzip
-
-  #     - run:
-  #         name: Ensure back-end infrastructure exists
-  #         command: |
-  #           aws cloudformation deploy \
-  #             --template-file .circleci/files/backend.yml \
-  #             --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
-  #             --tags project=udapeople 
-              
-              
-  #     - run:
-  #         name: Ensure front-end infrastructure exist
-  #         command: |
-  #           aws cloudformation deploy \
-  #             --template-file .circleci/files/frontend.yml \
-  #             --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
-  #             --tags project=udapeople
-                   
-          
-  #     - run:
-  #         name: Add back-end ip to ansible inventory
-  #         command: |
-  #             echo [all] > .circleci/ansible/inventory.txt
-  #             aws ec2 describe-instances \
-  #               --query 'Reservations[*].Instances[*].PublicIpAddress' \
-  #               --output text >> inventory
-            
-  #     - persist_to_workspace:
-  #         root: ~/
-  #         paths:
-  #           - project/.circleci/ansible/inventory.txt
-
-         
-  configure-infrastructure:
+  deploy-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: amazon/aws-cli
     steps:
       - checkout
-      - add_ssh_keys:
-          fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
-      - attach_workspace:
-          at: ~/
-       
-      - run:
-          name: Install dependencies
+      - run: 
+          name: Install tar and gzip
           command: |
-            apk add --update ansible
-            apk add --update tar 
-            apk add --update gzip
-            pip install awscli
+              yum -y install tar 
+              yum -y install gzip
 
-#             - run: yum -y install tar gzip
-#             exit 1
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
+              --tags project=udapeople 
+              
+              
+#       - run:
+#           name: Ensure front-end infrastructure exist
+#           command: |
+#             aws cloudformation deploy \
+#               --template-file .circleci/files/frontend.yml \
+#               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+#               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
+#               --tags project=udapeople
+                   
+          
+#       - run:
+#           name: Add back-end ip to ansible inventory
+#           command: |
+#               echo [all] > .circleci/ansible/inventory.txt
+#               aws ec2 describe-instances \
+#                 --query 'Reservations[*].Instances[*].PublicIpAddress' \
+#                 --output text >> inventory
+            
+#       - persist_to_workspace:
+#           root: ~/
+#           paths:
+#             - project/.circleci/ansible/inventory.txt
+#       - destroy-environment:
+#           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+         
+#   configure-infrastructure:
+#     docker:
+#       - image: python:3.7-alpine3.11
+#     steps:
+#       - checkout
+#       - add_ssh_keys:
+#           fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
+#       - attach_workspace:
+#           at: ~/
+       
+#       - run:
+#           name: Install dependencies
+#           command: |
+#             apk add --update ansible
+#             apk add --update tar 
+#             apk add --update gzip
+#  #           pip install awscli
+
 #       - run:
 #           name: Configure server
 #           command: |
-#             ansible-playbook -i inventory.txt playbook.yml
-#             # Your code here
-#             exit 1
-#       # Here's where you will add some code to rollback on failure          
-# ansible-playbook -i /tmp/ansible/inventory.txt .circleci/ansible/configure-server.yml
-#       - destroy-environment
+#             cd .circleci/ansible
+#             ansible-playbook -i inventory.txt configure-server.yml
+
+#       - destroy-environment:
+#           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+
 workflows:
   default:
     jobs:
@@ -196,11 +195,13 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
-      # - deploy-infrastructure:
-      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [master]
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [master]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
 
 
   #--stack-name udapeople-frontend-udapeople-fh1m246plxqqrs728 \
@@ -211,3 +212,11 @@ workflows:
             #--parameter-overrides ID=udapeople-fh1m246plxqqrs728  \ 
             #       - run: cat ~/inventory.txt
             #yum -y install tar gzip
+            # - run: yum -y install tar gzip
+#             exit 1
+#             ansible-playbook -i inventory.txt playbook.yml
+#             # Your code here
+#             exit 1
+#       # Here's where you will add some code to rollback on failure          
+# ansible-playbook -i /tmp/ansible/inventory.txt .circleci/ansible/configure-server.yml
+#       - destroy-environment
