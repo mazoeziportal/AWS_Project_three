@@ -152,6 +152,24 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
 
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
+      - attach_workspace:
+          at: ~/
+       
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+            apk add --update tar 
+            apk add --update gzip
+           
+
 
 workflows:
   default:
@@ -171,8 +189,8 @@ workflows:
           filters:
             branches:
               only: [master]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
 
 
   #--stack-name udapeople-frontend-udapeople-fh1m246plxqqrs728 \
@@ -297,5 +315,7 @@ workflows:
 #          --template-file cloudfront.yml \
 #          --stack-name InitialStack\
 #          --parameter-overrides WorkflowID=
+#pip install awscli
+
           
  
