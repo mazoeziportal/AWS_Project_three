@@ -8,8 +8,8 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:07}
-            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+          aws cloudformation delete-stack --stack-name udapeople-backend-udapeople-fh1m246plxqqrs728
+          aws cloudformation delete-stack --stack-name udapeople-frontend-udapeople-fh1m246plxqqrs728
             
                        
 
@@ -127,8 +127,11 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
-              --tags project=udapeople              
+              --parameter-overrides ID=udapeople-fh1m246plxqqrs728 \
+              --tags project=udapeople
+              
+ #             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
+                            
               
               
       - run:
@@ -137,9 +140,9 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID=udapeople-fh1m246plxqqrs728 \
               --tags project=udapeople
-                   
+ #             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \     
           
       - run:
           name: Add back-end ip to ansible inventory
@@ -155,7 +158,9 @@ jobs:
             - project/.circleci/ansible/inventory.txt
 
       - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+          workflow_id: udapeople-fh1m246plxqqrs728
+          
+ #         ${CIRCLE_WORKFLOW_ID:0:7}
          
 #   configure-infrastructure:
 #     docker:
@@ -234,5 +239,9 @@ workflows:
 
             # aws cloudformation delete-stack --stack-name udapeople-backend-udapeople-fh1m246plxqqrs728
  #           --parameter-overrides ID=udapeople-fh1m246plxqqrs728 \
+            
+            # aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:07}
+            # aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+            
             
  
