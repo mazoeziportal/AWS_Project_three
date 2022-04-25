@@ -107,12 +107,11 @@ jobs:
           command: |
              cd backend
              npm install
- 
              npm audit fix --audit-level=critical --force
              npm audit --audit-level=critical
 
-             
-#            npm install --save-dev webpack@5.72.0
+
+#   npm install --save-dev webpack@5.72.0
 #   deploy-infrastructure:
 #     docker:
 #       - image: amazon/aws-cli
