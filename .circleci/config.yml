@@ -159,7 +159,7 @@ jobs:
             - project/.circleci/ansible/inventory.txt
 
       - destroy-environment:
-          udapeople-fh1m246plxqqrs728
+          - udapeople-fh1m246plxqqrs728
 
  #         workflow_id: udapeople-fh1m246plxqqrs728
 
