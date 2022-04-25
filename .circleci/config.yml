@@ -8,7 +8,8 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name udapeople-backend-udapeople-fh1m246plxqqrs728
+            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:07}
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
             
                        
 
@@ -126,11 +127,11 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID=udapeople-fh1m246plxqqrs728 \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
               --tags project=udapeople
 
-              
-#              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
+
+#              
                
               
               
@@ -232,7 +233,10 @@ workflows:
  #echo "Destroying environment: << parameters.workflow_id >> "
  #           aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.workflow_id>>
  #           aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.workflow_id>>
- #           aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:07}
-            # aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+            # aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:07}
+            #  aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+
+            # aws cloudformation delete-stack --stack-name udapeople-backend-udapeople-fh1m246plxqqrs728
+ #           --parameter-overrides ID=udapeople-fh1m246plxqqrs728 \
             
  
