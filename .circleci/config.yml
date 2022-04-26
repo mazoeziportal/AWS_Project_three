@@ -127,7 +127,7 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
-              --stack-name "udapeople-backend-udapeople-fh1m246plxqqrs728" \
+              --stack-name udapeople-backend-udapeople-fh1m246plxqqrs728 \
               --parameter-overrides ID=udapeople-fh1m246plxqqrs728  \ 
               --tags project=udapeople 
 
