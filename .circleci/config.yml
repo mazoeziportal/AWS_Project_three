@@ -127,11 +127,13 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
-              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --stack-name "udapeople-backend-udapeople-fh1m246plxqqrs728" \
               --parameter-overrides ID=udapeople-fh1m246plxqqrs728  \ 
               --tags project=udapeople 
 
-  #        --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \    
+
+
+  #           --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \    
   #     - run:
   #         name: Ensure front-end infrastructure exist
   #         command: |
@@ -343,8 +345,9 @@ workflows:
 #          --template-file cloudfront.yml \
 #          --stack-name InitialStack\
 #          --parameter-overrides WorkflowID=
-#pip install awscli
-#npm run migrations:revert
+#      pip install awscli
+#      npm run migrations:revert
+#     stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
 
           
  
