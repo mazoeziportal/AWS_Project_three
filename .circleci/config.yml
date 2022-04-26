@@ -219,8 +219,8 @@ workflows:
               only: [master]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
 
 
   #--stack-name udapeople-frontend-udapeople-fh1m246plxqqrs728 \
