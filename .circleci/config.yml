@@ -106,8 +106,7 @@ jobs:
           name: Scan backend dependencies
           command: |
             cd backend
-            npm install
-            npm install --save-dev webpack@5.72.0
+            npm install           
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
 
@@ -348,6 +347,7 @@ workflows:
 #      pip install awscli
 #      npm run migrations:revert
 #     stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+# npm install --save-dev webpack@5.72.0
 
           
  
