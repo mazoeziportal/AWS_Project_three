@@ -228,7 +228,15 @@ jobs:
           name: Install dependencies
           command: |
             yum install python3-pip -y
+      # - run:
+      #     name: Get backend url
+      #     command: |
             
+      #       export BACKEND_IP=$(aws ec2 describe-instances...............)
+      #       export API_URL="http://${BACKEND_IP}:3030"
+      #       echo "API_URL = ${API_URL}"
+      #       echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+      #       cat frontend/.env
             
             
  #           pip install awscli
