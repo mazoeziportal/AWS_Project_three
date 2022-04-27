@@ -6,7 +6,6 @@ commands:
     steps:
       - run:
           name: Destroy environments
-          when: on_fail
           command: |
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:07}
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
@@ -178,8 +177,9 @@ jobs:
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
 
-      - destroy-environment:
-          workflow_id: "${CIRCLE_WORKFLOW_ID}"
+      - destroy-environment
+        when: on_fail
+ #         workflow_id: "${CIRCLE_WORKFLOW_ID}"
 
   run-migrations:
     docker:
@@ -205,10 +205,12 @@ jobs:
               curl https://kvdb.io/N4WnpYNLfMTMbwrNZrUZGT/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
 
-      - destroy-environment:
-          workflow_id: "${CIRCLE_WORKFLOW_ID}"
+      - destroy-environment
+        when: on_fail
 
-          
+ #         workflow_id: "${CIRCLE_WORKFLOW_ID}"
+
+
   # deploy-frontend:
   #   docker:
   #     - image: amazon/aws-cli # Docker image here that supports AWS CLI
