@@ -228,8 +228,14 @@ jobs:
           name: Install dependencies
           command: |
             yum install python3-pip -y
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" unzip awscliv2.zip
-            ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+            pip install awscli
+
+
+
+
+
+ #           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" unzip awscliv2.zip
+ #           ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
             
             
  #           npm install
