@@ -228,10 +228,13 @@ jobs:
           name: Install dependencies
           command: |
             yum install python3-pip -y
-            yum install -y nodejs
-            yum -y install curl -y
             npm install
-            pip install awscli
+            yum install -y nodejs
+ #           curl -sL https://rpm.nodesource.com/setup_13.8 | bash -
+ #           
+ #           yum -y install curl -y
+ #           npm install
+ #           pip install awscli
   #           apt-get update -y
             
 
