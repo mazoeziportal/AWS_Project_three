@@ -228,8 +228,13 @@ jobs:
           name: Install dependencies
           command: |
             yum install python3-pip -y
-            npm install
-            yum install -y nodejs
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+            
+            
+ #           npm install
+ #           yum install -y nodejs
  #           curl -sL https://rpm.nodesource.com/setup_13.8 | bash -
  #           
  #           yum -y install curl -y
