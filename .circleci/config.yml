@@ -228,7 +228,10 @@ jobs:
           name: Install dependencies
           command: |
             yum install python3-pip -y
-            pip install awscli
+            
+            
+            
+ #           pip install awscli
 
 
 
