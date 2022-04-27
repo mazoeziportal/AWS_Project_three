@@ -202,8 +202,70 @@ jobs:
             then
               curl https://kvdb.io/N4WnpYNLfMTMbwrNZrUZGT/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
-            
+
       - destroy-environment
+
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli # Docker image here that supports AWS CLI
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/  
+      - run:
+          name: Install dependencies
+          command: |
+            apt -y update && apt install -y python3
+            
+            
+            
+            
+            
+              
+            
+
+
+  #           apk add --update curl nodejs npm ansible zip
+  #           apt-get install -y Python3.8
+  #           pip install awscli
+  #           apk add --update curl nodejs npm
+  #           apk add --update curl tar
+  #           npm install
+  #           yum -y install nodejs
+  #           # your code here
+  #           apt-get install -y npm
+  #            apt update
+   #           pip install awscli
+  #     - run:
+  #         name: Get backend url
+  #         command: |
+  #           # your code here
+  #           export API_URL="http://${BACKEND_IP}:3030"
+  #           echo "${API_URL}"
+  #     - run:
+  #         name: Deploy frontend objects
+  #         command: |
+  #           # your code here
+  #     # Here's where you will add some code to rollback on failure 
+  # deploy-backend:
+  #   docker:
+  #     - image: python:3.7-alpine3.11
+  #      # Docker image here that supports Ansible
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
+
+
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           # your code here
+  #     - run:
+  #         name: Deploy backend
+  #         command: |
+  #           # your code here
+  #     # Here's where you will add some code to rollback on failure  
 
 workflows:
   default:
