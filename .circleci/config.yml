@@ -220,8 +220,11 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apt -y update && apt install -y python3
-            apk add --update ansible
+            apt-get install -y Python3.8
+            
+            
+ #           apt -y update && apt install -y python3
+ #           apk add --update ansible
             
             
             
