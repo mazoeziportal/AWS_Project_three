@@ -151,8 +151,8 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment:
-          workflow_id: "${CIRCLE_WORKFLOW_ID}"
+     - destroy-environment:
+         workflow_id: "${CIRCLE_WORKFLOW_ID}"
 
   configure-infrastructure:
     docker:
@@ -177,8 +177,8 @@ jobs:
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
 
-      - destroy-environment
-        when: on_fail
+ #     - destroy-environment
+ #       when: on_fail
  #         workflow_id: "${CIRCLE_WORKFLOW_ID}"
 
   run-migrations:
@@ -205,8 +205,8 @@ jobs:
               curl https://kvdb.io/N4WnpYNLfMTMbwrNZrUZGT/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
 
-      - destroy-environment
-        when: on_fail
+ #     - destroy-environment
+ #       when:on_fail
 
  #         workflow_id: "${CIRCLE_WORKFLOW_ID}"
 
