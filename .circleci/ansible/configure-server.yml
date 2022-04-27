@@ -68,10 +68,10 @@
 
   roles:
     - configure-server
-    - name: "install python for Ansible."
-    - name: "Upgrade or update package" 
-    - name: "install npm and node js"
-    - name: "install pm2"
+ #   - name: "install python for Ansible."
+ #   - name: "Upgrade or update package" 
+ #   - name: "install npm and node js"
+ #   - name: "install pm2"
 
 
 
