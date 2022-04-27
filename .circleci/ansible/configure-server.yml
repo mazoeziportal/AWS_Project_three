@@ -21,7 +21,9 @@
       become: true
       raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3)
       changed_when: false
-        - name: "update apt packages."
+
+        
+    - name: "update apt packages."
       become: yes
       apt:
         update_cache: yes
