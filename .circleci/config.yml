@@ -299,12 +299,12 @@ workflows:
           filters:
             branches:
               only: [master]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
+ #     - configure-infrastructure:
+ #         requires: [deploy-infrastructure]
+ #     - run-migrations:
+ #         requires: [configure-infrastructure]
+ #     - deploy-frontend:
+ #         requires: [run-migrations]
 
 
   #--stack-name udapeople-frontend-udapeople-fh1m246plxqqrs728 \
