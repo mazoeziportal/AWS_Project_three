@@ -210,6 +210,11 @@ jobs:
       - image: amazon/aws-cli # Docker image here that supports AWS CLI
     steps:
       - checkout
+      - run:
+          name: Install tar/gzip utility
+          command: | 
+            yum -y install tar
+            yum -y install gzip
       - attach_workspace:
           at: ~/  
       - run:
@@ -228,6 +233,8 @@ jobs:
 
   #           apk add --update curl nodejs npm ansible zip
   #           apt-get install -y Python3.8
+  #           apk add --update ansible
+   #          pip install awscli
   #           pip install awscli
   #           apk add --update curl nodejs npm
   #           apk add --update curl tar
