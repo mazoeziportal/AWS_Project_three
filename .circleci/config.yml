@@ -212,21 +212,22 @@ jobs:
  #         workflow_id: "${CIRCLE_WORKFLOW_ID}"
 
 
-  # deploy-frontend:
-  #   docker:
-  #     - image: amazon/aws-cli # Docker image here that supports AWS CLI
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Install tar/gzip utility
-  #         command: | 
-  #           yum -y install tar
-  #           yum -y install gzip
-  #     - attach_workspace:
-  #         at: ~/  
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli # Docker image here that supports AWS CLI
+    steps:
+      - checkout
+      - run:
+          name: Install tar/gzip utility
+          command: | 
+            yum -y install tar
+            yum -y install gzip
+      - attach_workspace:
+          at: ~/  
+      - run:
+          name: Install dependencies
+          command: |
+            yum install python3-pip -y
   #           apt-get update -y
             
 
@@ -310,8 +311,8 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
- #     - deploy-frontend:
- #         requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations]
 
 
   #--stack-name udapeople-frontend-udapeople-fh1m246plxqqrs728 \
