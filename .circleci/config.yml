@@ -214,8 +214,9 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: circleci/node:13.8.0
- #     amazon/aws-cli
+      - image: amazon/aws-cli
+      
+ #     circleci/node:13.8.0
  #       user: root
     steps:
       - checkout
@@ -229,6 +230,8 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+            yum -y install nodejs
             yum install python3-pip -y
             npm install
             npm run build
