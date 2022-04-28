@@ -413,6 +413,8 @@ workflows:
           requires: [configure-infrastructure]
       - deploy-frontend:
           requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
 
 
   #--stack-name udapeople-frontend-udapeople-fh1m246plxqqrs728 \
