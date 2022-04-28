@@ -267,8 +267,8 @@ jobs:
       - attach_workspace:
           at: ~/
  #         paths:
-            - project/.circleci/ansible/inventory.txt
-      # attach workspace
+ #           - project/.circleci/ansible/inventory.txt
+ #         # attach workspace
       - run:
           name: Install dependencies
           command: |
