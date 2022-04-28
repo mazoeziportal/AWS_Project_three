@@ -256,6 +256,52 @@ jobs:
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       - destroy-environment
+  deploy-backend:
+    docker: 
+      - image: python:3.7-alpine3.11
+      # Docker image here that supports Ansible
+    steps:
+      checkout 
+      - add_ssh_keys:
+          fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
+      - attach_workspace:
+          at: ~/
+ #         paths:
+            - project/.circleci/ansible/inventory.txt
+      # attach workspace
+      - run:
+          name: Install dependencies
+          command: |
+          apk add --update ansible
+          apk add --update tar 
+            apk add --update gzip
+            apk add --update curl nodejs npm
+            # your code here
+      - run:
+          name: Deploy backend
+          command: |
+            cd backend
+              npm i
+              npm run build
+              cd ..
+              tar -C backend -czvf artifact.tar.gz .
+              cd .circleci/ansible
+              echo "Contents  of the inventory.txt file is -------"
+              cat inventory.txt
+              ansible-playbook -i inventory.txt deploy-backend.yml
+      - destroy-environment
+
+
+
+
+            # your code here
+      # Here's where you will add some code to rollback on failure 
+ 
+ 
+ 
+ 
+ 
+ 
  #     - revert-migrations 
             
 
@@ -263,7 +309,11 @@ jobs:
 
  #           pip install awscli
 
-
+ #           curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+ #           yum -y install nodejs
+ #           npm install -g npm
+ #           npm install oauth2
+ #           npm install webpack
 
 
 
