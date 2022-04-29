@@ -140,312 +140,238 @@ jobs:
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
               --tags project=udapeople
-      - run:
-          name: Add back-end ip to ansible inventory
-          command: |
-            echo [all] > .circleci/ansible/inventory.txt
-            aws ec2 describe-instances \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --output text >> inventory
+#       - run:
+#           name: Add back-end ip to ansible inventory
+#           command: |
+#             echo [all] > .circleci/ansible/inventory.txt
+#             aws ec2 describe-instances \
+#               --query 'Reservations[*].Instances[*].PublicIpAddress' \
+#               --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+#               --output text >> inventory
             
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/.circleci/ansible/inventory.txt
- #     - destroy-environment:
- #         workflow_id: "${CIRCLE_WORKFLOW_ID}"
+#       - persist_to_workspace:
+#           root: ~/
+#           paths:
+#             - project/.circleci/ansible/inventory.txt
+#  #     - destroy-environment:
+#  #         workflow_id: "${CIRCLE_WORKFLOW_ID}"
 
-  configure-infrastructure:
-    docker:
-      - image: python:3.7-alpine3.11
-    steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
-      - attach_workspace:
-          at: ~/
+#   configure-infrastructure:
+#     docker:
+#       - image: python:3.7-alpine3.11
+#     steps:
+#       - checkout
+#       - add_ssh_keys:
+#           fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
+#       - attach_workspace:
+#           at: ~/
        
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update ansible
-            apk add --update tar 
-            apk add --update gzip
+#       - run:
+#           name: Install dependencies
+#           command: |
+#             apk add --update ansible
+#             apk add --update tar 
+#             apk add --update gzip
           
-      - run:
-          name: Configure server
-          command: |
-            cd .circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml
+#       - run:
+#           name: Configure server
+#           command: |
+#             cd .circleci/ansible
+#             ansible-playbook -i inventory.txt configure-server.yml
 
- #     - destroy-environment
- #       when: on_fail
- #         workflow_id: "${CIRCLE_WORKFLOW_ID}"
+#  #     - destroy-environment
+#  #       when: on_fail
+#  #         workflow_id: "${CIRCLE_WORKFLOW_ID}"
 
-  run-migrations:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - restore_cache:
-          keys: [backend-build]
-      - run:
-          name: Run migrations
-          command: |
-            cd backend
-            npm install
-            npm run build
-            npm run migrations > migrations_dump.txt
-            cat migrations_dump.txt
+#   run-migrations:
+#     docker:
+#       - image: circleci/node:13.8.0
+#     steps:
+#       - checkout
+#       - restore_cache:
+#           keys: [backend-build]
+#       - run:
+#           name: Run migrations
+#           command: |
+#             cd backend
+#             npm install
+#             npm run build
+#             npm run migrations > migrations_dump.txt
+#             cat migrations_dump.txt
 
-      - run:
-          name: Send migration status to kvdb.io 
-          command: | 
-            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-            then
-              curl https://kvdb.io/N4WnpYNLfMTMbwrNZrUZGT/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-            fi
-
-
- #     - destroy-environment
- #       when:on_fail
-
- #         workflow_id: "${CIRCLE_WORKFLOW_ID}"
+#       - run:
+#           name: Send migration status to kvdb.io 
+#           command: | 
+#             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+#             then
+#               curl https://kvdb.io/N4WnpYNLfMTMbwrNZrUZGT/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+#             fi
 
 
-  deploy-frontend:
-    docker:
-      - image: amazon/aws-cli
-        user: root
+#  #     - destroy-environment
+#  #       when:on_fail
+
+#  #         workflow_id: "${CIRCLE_WORKFLOW_ID}"
+
+
+#   deploy-frontend:
+#     docker:
+#       - image: amazon/aws-cli
+#         user: root
       
- #     circleci/node:13.8.0
- #       user: root
-    steps:
-      - checkout
-      - run:
-          name: Install tar/gzip utility
-          command: | 
-            yum -y install tar
-            yum -y install gzip
-      - attach_workspace:
-          at: ~/  
-      - run:
-          name: Install dependencies
-          command: |
-            curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
-            yum -y install nodejs
-            yum install python3-pip -y
- #           sudo apt install npm 
- #           npm run build
- #           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
- #           unzip awscliv2.zip
- #           sudo ./aws/install
-      - run:
-          name: Get backend url
-          command: |
-            BACKEND_IP=$(aws ec2 describe-instances \
-            --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
-            export BACKEND_IP=$(aws ec2 describe-instances...............)
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "API_URL = ${API_URL}"
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-            cat frontend/.env
-      - run:
-          name: Deploy frontend objects
-          command: |
-            cd frontend
-            npm install
-            npm run build
-            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - destroy-environment
-  deploy-backend:
-    docker: 
-      - image: python:3.7-alpine3.11
-      # Docker image here that supports Ansible
-    steps:
-      - checkout 
-      - add_ssh_keys:
-          fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
-      - attach_workspace:
-          at: ~/
- #         paths:
- #           - project/.circleci/ansible/inventory.txt
- #         # attach workspace
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update ansible
-            apk add --update tar 
-            apk add --update gzip
-            apk add --update curl nodejs npm
-            apk add --no-cache \
-                python3 \
-                py3-pip \
-            && pip3 install --upgrade pip \
-            && pip3 install awscli 
-            echo 'aws cli version:'
-            aws --version
+#  #     circleci/node:13.8.0
+#  #       user: root
+#     steps:
+#       - checkout
+#       - run:
+#           name: Install tar/gzip utility
+#           command: | 
+#             yum -y install tar
+#             yum -y install gzip
+#       - attach_workspace:
+#           at: ~/  
+#       - run:
+#           name: Install dependencies
+#           command: |
+#             curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+#             yum -y install nodejs
+#             yum install python3-pip -y  
+#  ###        sudo apt install npm 
+#  ###        npm run build
+#  #           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+#  #           unzip awscliv2.zip
+#  ####        sudo ./aws/install
+#       - run:
+#           name: Get backend url
+#           command: |
+#             BACKEND_IP=$(aws ec2 describe-instances \
+#             --query 'Reservations[*].Instances[*].PublicIpAddress' \
+#             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
+#             export BACKEND_IP=$(aws ec2 describe-instances...............)
+#             export API_URL="http://${BACKEND_IP}:3030"
+#             echo "API_URL = ${API_URL}"
+#             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+#             cat frontend/.env
+#       - run:
+#           name: Deploy frontend objects
+#           command: |
+#             cd frontend
+#             npm install
+#             npm run build
+#             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+#             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+#       - destroy-environment
+#   deploy-backend:
+#     docker: 
+#       - image: python:3.7-alpine3.11
+#       # Docker image here that supports Ansible
+#     steps:
+#       - checkout 
+#       - add_ssh_keys:
+#           fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
+#       - attach_workspace:
+#           at: ~/
+ 
+#       - run:
+#           name: Install dependencies
+#           command: |
+#             apk add --update ansible
+#             apk add --update tar 
+#             apk add --update gzip
+#             apk add --update curl nodejs npm
+#             apk add --no-cache \
+#                 python3 \
+#                 py3-pip \
+#             && pip3 install --upgrade pip \
+#             && pip3 install awscli 
+#             echo 'aws cli version:'
+#             aws --version
             
  
-      - run:
-          name: Deploy backend
-          command: |
-            cd backend
-              npm i
-              npm run build
-              cd ..
-              tar -C backend -czvf artifact.tar.gz .
-              cd .circleci/ansible
-              echo [web] > inventory.txt
-              aws ec2 describe-instances \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:project,Values=udapeople" \
-              --output text >> inventory.txt
-              cat inventory.txt
-              ansible-playbook -i inventory.txt deploy-backend.yml
-              cat inventory.txt
-              ansible-playbook -i inventory.txt deploy-backend.yml
-      - destroy-environment
-  smoke-test:
-    docker:
-      - image: python:3.7-alpine3.11 
+#       - run:
+#           name: Deploy backend
+#           command: |
+#             cd backend
+#               npm i
+#               npm run build
+#               cd ..
+#               tar -C backend -czvf artifact.tar.gz .
+#               cd .circleci/ansible
+#               echo [web] > inventory.txt
+#               aws ec2 describe-instances \
+#               --query 'Reservations[*].Instances[*].PublicIpAddress' \
+#               --filters "Name=tag:project,Values=udapeople" \
+#               --output text >> inventory.txt
+#               cat inventory.txt
+#               ansible-playbook -i inventory.txt deploy-backend.yml
+#               cat inventory.txt
+#               ansible-playbook -i inventory.txt deploy-backend.yml
+#       - destroy-environment
+#   smoke-test:
+#     docker:
+#       - image: python:3.7-alpine3.11 
       
-    steps:
-      - checkout 
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update curl nodejs npm
-            pip install awscli
-            aws --version
-      # - run:
-      #     name: Get backend url
-      #     command: |
-      #       BACKEND_IP=$(aws ec2 describe-instances \
-      #         --query 'Reservations[*].Instances[*].PublicIpAddress' \
-      #         --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
-      - run:
-          name: Backend smoke test.
-          command: |
-            BACKEND_IP=$(aws ec2 describe-instances \
-            --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
-            if curl "${API_URL}/api/status" | grep "ok"
-            then
-                return 0
-            else
-                return 1
-            fi
- #     - run:
- #         name: Frontend smoke test.
- #         command: |
-            # your code here
-      # Here's where you will add some code to rollback on failure  
+#     steps:
+#       - checkout 
+#       - run:
+#           name: Install dependencies
+#           command: |
+#             apk add --update curl nodejs npm
+#             pip install awscli
+#             aws --version
 
 
 
 
-            # your code here
-      # Here's where you will add some code to rollback on failure 
+
+
+
+
+
+#       # - run:
+#       #     name: Get backend url
+#       #     command: |
+#       #       BACKEND_IP=$(aws ec2 describe-instances \
+#       #         --query 'Reservations[*].Instances[*].PublicIpAddress' \
+#       #         --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
+#       - run:
+#           name: Backend smoke test.
+#           command: |
+#             export BACKEND_IP=$(aws ec2 describe-instances \
+#             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}"
+#             --query 'Reservations[*].Instances[*].PublicIpAddress' \
+#             --output text)
+#             export API_URL="http://${BACKEND_IP}:3030"
+#             echo "${API_URL}"
+#             if curl "${API_URL}/api/status" | grep "ok"
+#             then
+#                 return 0
+#             else
+#                 return 1
+#             fi
+
+            
+#             # export BACKEND_IP=$(aws ec2 describe-instances \
+#             # --query 'Reservations[*].Instances[*].PublicIpAddress' \
+#             # --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
+#             # export API_URL="http://${BACKEND_IP}:3030"
+#             # echo "${API_URL}"
+#             # if curl "${API_URL}/api/status" | grep "ok"
+#             # then
+#             #     return 0
+#             # else
+#             #     return 1
+#             # fi
+
+
+
+
+
+
+
+
+
  
- # apk add --update ansible
- #           apk add --update tar 
- #           apk add --update gzip
- 
- 
- 
- 
- #     - revert-migrations 
-            
-
-
-
- #           pip install awscli
-# pip install awscli
- #           curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
- #           yum -y install nodejs
- #           npm install -g npm
- #           npm install oauth2
- #           npm install webpack
-
-
-
- #           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" unzip awscliv2.zip
- #           ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
-            
-            
- #           npm install
- #           yum install -y nodejs
- #           curl -sL https://rpm.nodesource.com/setup_13.8 | bash -
- #           
- #           yum -y install curl -y
- #           npm install
- #           pip install awscli
-  #           apt-get update -y
-            
-
- #           apt-get install -y Python3.8
-            
-            
- #           apt -y update && apt install -y python3
- #           apk add --update ansible
-            
- #           echo "Contents  of the inventory.txt file is -------"
-            
-            
-            
-              
-            
-
-
-  #           apk add --update curl nodejs npm ansible zip
-  #           apt-get install -y Python3.8
-  #           apk add --update ansible
-   #          pip install awscli
-  #           pip install awscli
-  #           apk add --update curl nodejs npm
-  #           apk add --update curl tar
-  #           npm install
-  #           yum -y install nodejs
-  #           # your code here
-  #           apt-get install -y npm
-  #            apt update
-   #           pip install awscli
-  #     - run:
-  #         name: Get backend url
-  #         command: |
-  #           # your code here
-  #           export API_URL="http://${BACKEND_IP}:3030"
-  #           echo "${API_URL}"
-  #     - run:
-  #         name: Deploy frontend objects
-  #         command: |
-  #           # your code here
-  #     # Here's where you will add some code to rollback on failure 
-  # deploy-backend:
-  #   docker:
-  #     - image: python:3.7-alpine3.11
-  #      # Docker image here that supports Ansible
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
-
-
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # your code here
-  #     - run:
-  #         name: Deploy backend
-  #         command: |
-  #           # your code here
-  #     # Here's where you will add some code to rollback on failure  
 
 workflows:
   default:
@@ -465,16 +391,16 @@ workflows:
           filters:
             branches:
               only: [master]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
-      - smoke-test:
-          requires: [deploy-backend, deploy-frontend]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]
+      # - smoke-test:
+      #     requires: [deploy-backend, deploy-frontend]
 
 
   #--stack-name udapeople-frontend-udapeople-fh1m246plxqqrs728 \
@@ -616,8 +542,116 @@ workflows:
 ##              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
 #--parameter-overrides ID=udapeople-fh1m246plxqqrs728
   #           --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \ 
-
+#         paths:
+ #           - project/.circleci/ansible/inventory.txt
+ #         # attach workspace
           
  #sudo update apt packages
  #           npm install
  #           apt-get update && sudo apt-get install -yy less
+
+ #     - run:
+ #         name: Frontend smoke test.
+ #         command: |
+            # your code here
+      # Here's where you will add some code to rollback on failure  
+
+
+
+
+            # your code here
+      # Here's where you will add some code to rollback on failure 
+ 
+ # apk add --update ansible
+ #           apk add --update tar 
+ #           apk add --update gzip
+ 
+ 
+ 
+ 
+ #     - revert-migrations 
+            
+
+
+
+ #           pip install awscli
+# pip install awscli
+ #           curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+ #           yum -y install nodejs
+ #           npm install -g npm
+ #           npm install oauth2
+ #           npm install webpack
+
+
+
+ #           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" unzip awscliv2.zip
+ #           ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+            
+            
+ #           npm install
+ #           yum install -y nodejs
+ #           curl -sL https://rpm.nodesource.com/setup_13.8 | bash -
+ #           
+ #           yum -y install curl -y
+ #           npm install
+ #           pip install awscli
+  #           apt-get update -y
+            
+
+ #           apt-get install -y Python3.8
+            
+            
+ #           apt -y update && apt install -y python3
+ #           apk add --update ansible
+            
+ #           echo "Contents  of the inventory.txt file is -------"
+            
+            
+            
+              
+            
+
+
+  #           apk add --update curl nodejs npm ansible zip
+  #           apt-get install -y Python3.8
+  #           apk add --update ansible
+   #          pip install awscli
+  #           pip install awscli
+  #           apk add --update curl nodejs npm
+  #           apk add --update curl tar
+  #           npm install
+  #           yum -y install nodejs
+  #           # your code here
+  #           apt-get install -y npm
+  #            apt update
+   #           pip install awscli
+  #     - run:
+  #         name: Get backend url
+  #         command: |
+  #           # your code here
+  #           export API_URL="http://${BACKEND_IP}:3030"
+  #           echo "${API_URL}"
+  #     - run:
+  #         name: Deploy frontend objects
+  #         command: |
+  #           # your code here
+  #     # Here's where you will add some code to rollback on failure 
+  # deploy-backend:
+  #   docker:
+  #     - image: python:3.7-alpine3.11
+  #      # Docker image here that supports Ansible
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
+
+
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           # your code here
+  #     - run:
+  #         name: Deploy backend
+  #         command: |
+  #           # your code here
+  #     # Here's where you will add some code to rollback on failure  
