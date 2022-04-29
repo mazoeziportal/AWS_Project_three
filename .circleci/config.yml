@@ -292,18 +292,40 @@ jobs:
           name: Deploy backend
           command: |
             cd backend
-              npm i
-              npm run build
-              cd ..
-              tar -C backend -czvf artifact.tar.gz .
-              cd .circleci/ansible
-              echo [web] > inventory.txt
-              aws ec2 describe-instances \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:project,Values=udapeople" \
-              --output text >> inventory.txt
-              cat inventory.txt
-              ansible-playbook -i inventory.txt deploy-backend.yml
+            npm i
+            npm run build
+            cp package* ./dist
+            cd ..
+            echo "Zip the directory and copy it to ansible deploy role"
+            tar -C backend -czvf artifact.tar.gz .
+            mkdir .circleci/ansible/roles/deploy/files
+            mv artifact.tar.gz .circleci/ansible/roles/deploy/files
+            echo "Check inventory and execute ansible playbook"
+            cd .circleci/ansible
+            echo "Contents of the inventory.txt file are -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+
+
+
+
+
+
+
+
+            # cd backend
+            #   npm i
+            #   npm run build
+            #   cd ..
+            #   tar -C backend -czvf artifact.tar.gz .
+            #   cd .circleci/ansible
+            #   echo [web] > inventory.txt
+            #   aws ec2 describe-instances \
+            #   --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            #   --filters "Name=tag:project,Values=udapeople" \
+            #   --output text >> inventory.txt
+            #   cat inventory.txt
+            #   ansible-playbook -i inventory.txt deploy-backend.yml
               
       - destroy-environment
   smoke-test:
