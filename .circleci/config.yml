@@ -297,7 +297,7 @@ jobs:
               cd ..
               tar -C backend -czvf artifact.tar.gz .
               cd .circleci/ansible
-              echo [web] > inventory.txt
+              echo [web] >> inventory.txt
               aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --filters "Name=tag:project,Values=udapeople" \
