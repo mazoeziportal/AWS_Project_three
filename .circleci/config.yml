@@ -299,7 +299,13 @@ jobs:
               cd ..
               tar -C backend -czvf artifact.tar.gz .
               cd .circleci/ansible
-              echo "Contents  of the inventory.txt file is -------"
+              echo [web] > inventory.txt
+              aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters "Name=tag:project,Values=udapeople" \
+              --output text >> inventory.txt
+              cat inventory.txt
+              ansible-playbook -i inventory.txt deploy-backend.yml
               cat inventory.txt
               ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment
@@ -389,7 +395,7 @@ jobs:
  #           apt -y update && apt install -y python3
  #           apk add --update ansible
             
-            
+ #           echo "Contents  of the inventory.txt file is -------"
             
             
             
