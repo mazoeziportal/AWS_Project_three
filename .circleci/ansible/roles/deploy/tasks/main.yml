@@ -48,17 +48,53 @@
 #   register: printenv_out
 
 # - debug: var=printenv_out.stdout_lines
-- name: "Move backend files to server."
-  copy:
-    src: /root/project/backend_artifact.tar.gz
-    dest: ~/home/ubuntu
+##############
+# - name: "Move backend files to server."
+#   copy:
+#     src: /root/project/backend_artifact.tar.gz
+#     dest: ~/home/ubuntu
     
+# - name: "Install package dependencies"
+#   shell: |
+#     cd ~/home/ubuntu
+#     tar -xzvf backend_artifact.tar.gz -C backend
+#     rm backend_artifact.tar.gz
+#     cd backend/
+#     npm run build
+#     cd dist
+#     pm2 start npm --name backend -- start
+# ########################
+- name: create backend directory on EC2
+  become: yes
+  file:
+    path:  /home/ubuntu/backend
+    state: directory
+
+
+  #   - name: Creates directory
+  # file:
+  #   path: ~/web
+  #   state: directory
+- name: copy files to backend
+  become: yes
+  copy: 
+    src: /root/project/backend_artifact.tar.gz
+    dest: ~/home/ubuntu/backend
+    ignore_errors: "{{ ansible_check_mode }}"
+
+# - name: Copy index test page
+#   template:
+#     src: "files/index.js"
+#     dest: "~/web/index.js"
+
 - name: "Install package dependencies"
   shell: |
     cd ~/home/ubuntu
     tar -xzvf backend_artifact.tar.gz -C backend
     rm backend_artifact.tar.gz
     cd backend/
+    npm install
     npm run build
     cd dist
-    pm2 start npm --name backend -- start
+    pm2 stop default
+    pm2 start npm --~/home/ubuntu/backend -- start -f
