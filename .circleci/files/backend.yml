@@ -26,8 +26,8 @@ Resources:
           ToPort: 5432
           CidrIp: 0.0.0.0/0
         - IpProtocol: All
-          FromPort: All
-          ToPort: All
+          FromPort: -1
+          ToPort: -1
           CidrIp: 0.0.0.0/0
         
 
