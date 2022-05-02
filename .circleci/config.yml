@@ -161,7 +161,7 @@ jobs:
             - inventory.txt
 
 ## inventory.txt
-project/.circleci/ansible/inventory.txt
+# project/.circleci/ansible/inventory.txt
  # aws ec2 describe-instances \
  # --query 'Reservations[*].Instances[*].PublicIpAddress' \
  #   --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
