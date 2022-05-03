@@ -206,9 +206,12 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible
-            apk add --update tar 
-            apk add --update gzip
+            pip3 install ansible awscli
+            sudo apt-get install -y tar gzip
+
+ #           apk add --update ansible
+ #           apk add --update tar 
+ #           apk add --update gzip
  #           pip install gcc -y
  #           pip3 install ansible awscli
           
