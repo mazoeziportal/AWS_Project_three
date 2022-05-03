@@ -322,10 +322,7 @@ jobs:
             && pip3 install awscli \
             echo 'aws cli version:'
             aws --version
-            -m pip install --upgrade pip
-            sudo apt-get install -y nodejs build-essential
- #           && pip3 install ansible-modules-pm2
- 
+            
       - run:
           name: Deploy backend
           command: |
