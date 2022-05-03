@@ -189,8 +189,8 @@ jobs:
             apk add --update ansible
             apk add --update tar 
             apk add --update gzip
-            pip install gcc -y
-            pip3 install ansible awscli
+ #           pip install gcc -y
+ #           pip3 install ansible awscli
           
       - run:
           name: Configure server
@@ -235,99 +235,99 @@ jobs:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
 
-#   deploy-frontend:
-#     docker:
-#       - image: amazon/aws-cli
-#         user: root
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli
+        user: root
 
-#     steps:
-#       - checkout
-#       - run:
-#           name: Install tar/gzip utility
-#           command: | 
-#             yum -y install tar
-#             yum -y install gzip
-#       - attach_workspace:
-#           at: ~/  
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
-#             yum -y install nodejs
-#             yum install python3-pip -y
-#             yum install ansible -y
+    steps:
+      - checkout
+      - run:
+          name: Install tar/gzip utility
+          command: | 
+            yum -y install tar
+            yum -y install gzip
+      - attach_workspace:
+          at: ~/  
+      - run:
+          name: Install dependencies
+          command: |
+            curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+            yum -y install nodejs
+            yum install python3-pip -y
+            yum install ansible -y
 
-#       - run:
-#           name: Get backend url
-#           command: |
-#             export BACKEND_IP=$(aws ec2 describe-instances \
-#             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-#             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
-#             export API_URL="http://${BACKEND_IP}:3030"
-#             echo "API_URL = ${API_URL}"
-#             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-#             cat frontend/.env
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
 
-#       - run:
-#           name: Deploy frontend objects
-#           command: |
-#             cd frontend
-#             npm install
-#             npm run build
-#             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-#             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
-#   deploy-backend:
-#     docker: 
-#       - image: python:3.7-alpine3.11
-#       # Docker image here that supports Ansible
-#     steps:
-#       - checkout 
-#       - add_ssh_keys:
-#           fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
-#       - attach_workspace:
-#           at: ~/
+  deploy-backend:
+    docker: 
+      - image: python:3.7-alpine3.11
+      # Docker image here that supports Ansible
+    steps:
+      - checkout 
+      - add_ssh_keys:
+          fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
+      - attach_workspace:
+          at: ~/
  
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             pip3 install ansible awscli ansible-modules-pm2
-#             apk add --update ansible
-#             apk add --update tar 
-#             apk add --update gzip
-#             apk add --update curl nodejs npm
-#             apk add --no-cache \
-#                 python3 \
-#                 py3-pip \
-#             && pip3 install --upgrade pip \
-#             && pip3 install awscli 
-#             echo 'aws cli version:'
-#             aws --version
+      - run:
+          name: Install dependencies
+          command: |
+            pip3 install ansible awscli ansible-modules-pm2
+            apk add --update ansible
+            apk add --update tar 
+            apk add --update gzip
+            apk add --update curl nodejs npm
+            apk add --no-cache \
+                python3 \
+                py3-pip \
+            && pip3 install --upgrade pip \
+            && pip3 install awscli 
+            echo 'aws cli version:'
+            aws --version
             
  
-#       - run:
-#           name: Deploy backend
-#           command: |
-#               echo ENVIRONMENT=production >> "backend/.env"
-#               echo TYPEORM_CONNECTION=postgres >> "backend/.env"
-#               echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-#               echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
-#               echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
-#               echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
-#               echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
-#               echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
-#               echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
-#               echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
-#             cd backend
-#             npm i
-#             npm run build
-#             cd ..
-#             tar -C backend -czvf artifact.tar.gz .
-#             cp artifact.tar.gz /tmp
-#             cd .circleci/ansible
-#             echo "Contents of the inventory.txt file are -------"
-#             cat inventory.txt
-#             ansible-playbook -i inventory.txt deploy-backend.yml
+      - run:
+          name: Deploy backend
+          command: |
+            echo ENVIRONMENT=production >> "backend/.env"
+            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
+            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
+            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
+            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
+            cd backend
+            npm i
+            npm run build
+            cd ..
+            tar -C backend -czvf artifact.tar.gz .
+            cp artifact.tar.gz /tmp
+            cd .circleci/ansible
+            echo "Contents of the inventory.txt file are -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
 ###############################################above new code###############
 
 
@@ -706,12 +706,12 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
 
 
   #--stack-name udapeople-frontend-udapeople-fh1m246plxqqrs728 \
