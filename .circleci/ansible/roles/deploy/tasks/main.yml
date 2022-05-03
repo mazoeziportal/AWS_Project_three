@@ -1,4 +1,61 @@
 ---
+- name: create backend directory on EC2
+  become: yes
+  file:
+    path: /home/ubuntu/backend
+    state: directory
+
+- name: copy artifact.tar.gz
+  unarchive:
+    src: /home/circleci/project/artifact.tar.gz
+    dest: /home/ubuntu/backend
+
+- name: "upgrade packages."
+  become: true
+  apt:
+    upgrade: "yes"
+
+- name: install curl
+  apt: 
+    name: 
+      - curl
+    update_cache: yes
+    cache_valid_time: 3600
+  become: true
+
+- name: get url
+  shell: |
+      curl -sL https://deb.nodesource.com/setup_13.8.0 | sudo -E bash -
+  become: true 
+
+- name: install node
+  apt: 
+    name: 
+      - nodejs
+    update_cache: yes
+    cache_valid_time: 3600
+  become: true
+
+- name: "install pm2"
+  become: true
+  npm:
+    name: pm2
+    global: yes
+    production: yes
+    state: present
+
+- name: Start the app
+  shell: |
+      cd /home/ubuntu/backend
+      npm install
+      npm audit fix 
+      pm2 list && ps aux|grep node
+      pm2 stop default
+      pm2 start npm -- run start
+  become: true 
+
+
+#########################the begining code####################
 # - name: create backend directory on EC2
 #   become: yes
 #   file:
@@ -63,38 +120,91 @@
 #     npm run build
 #     cd dist
 #     pm2 start npm --name backend -- start
-# ########################
-- name: create backend directory on EC2
-  become: yes
-  file:
-    path:  /home/ubuntu/backend
-    state: directory
+# ########################my code starts####################
+# - name: create backend directory on EC2
+#   become: yes
+#   file:
+#     path:  /home/ubuntu/backend
+#     state: directory
 
 
-  #   - name: Creates directory
-  # file:
-  #   path: ~/web
-  #   state: directory
-- name: copy files to backend
-  become: yes
-  copy: 
-    src: /root/project/backend_artifact.tar.gz
-    dest: ~/home/ubuntu/backend
-    ignore_errors: "{{ ansible_check_mode }}"
+#   #  - name: Creates directory
+#   # file:
+#   #   path: ~/web
+#   #   state: directory
+# - name: copy files to backend
+#   become: yes
+#   copy: 
+#     src: ~/project/backend_artifact.tar.gz
+#     dest: ~/home/ubuntu/backend
+#     ignore_errors: "{{ ansible_check_mode }}"
 
 # - name: Copy index test page
 #   template:
 #     src: "files/index.js"
 #     dest: "~/web/index.js"
 
-- name: "Install package dependencies"
-  shell: |
-    cd ~/home/ubuntu
-    tar -xzvf backend_artifact.tar.gz -C backend
-    rm backend_artifact.tar.gz
-    cd backend/
-    npm install
-    npm run build
-    cd dist
-    pm2 stop default
-    pm2 start npm --~/home/ubuntu/backend -- start -f
+# - name: "Install package dependencies"
+#   shell: |
+#     cd ~/home/ubuntu
+#     tar -xzvf backend_artifact.tar.gz -C backend
+#     rm backend_artifact.tar.gz
+#     cd backend/
+#     npm install
+#     npm run build
+#     cd dist
+#     pm2 stop default
+#     pm2 start npm --~/home/ubuntu/backend -- start -f
+#############mycode ends##############
+##########################newcode########################
+# - name: Creates backend directory
+#   file:
+#     path: /home/ubuntu/backend
+#     state: directory
+
+# - name: copy artifact.tar.gz
+#   unarchive:
+#     src: /home/circleci/project/artifact.tar.gz
+#     dest: /home/ubuntu/backend
+# - name: "upgrade packages."
+#   become: true
+#   apt:
+#     upgrade: "yes"
+# - name: install curl
+#   apt: 
+#     name: 
+#       - curl
+#     update_cache: yes
+#     cache_valid_time: 3600
+#   become: True
+
+# - name: get url
+#   shell: |
+#       curl -sL https://deb.nodesource.com/setup_13.8.0 | sudo -E bash -
+#   become: True 
+
+# - name: install node
+#   apt: 
+#     name: 
+#       - nodejs
+#     update_cache: yes
+#     cache_valid_time: 3600
+#   become: True
+
+# - name: "install pm2"
+#   become: true
+#   npm:
+#     name: pm2
+#     global: yes
+#     production: yes
+#     state: present
+
+# - name: Start the app
+#   shell: |
+#       cd /home/ubuntu/backend
+#       npm install
+#       npm audit fix 
+#       pm2 list && ps aux|grep node
+#       pm2 stop default
+#       pm2 start npm -- run start
+#   become: True 
