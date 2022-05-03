@@ -322,6 +322,7 @@ jobs:
             && pip3 install awscli \
             echo 'aws cli version:'
             aws --version
+            -m pip install --upgrade pip
             
       - run:
           name: Deploy backend
@@ -855,7 +856,7 @@ workflows:
 #               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
 #               --tags project=udapeople
 
- #              
+ #          #   c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8
  #   --parameter-overrides ID=udapeople-fh1m246plxqqrs728 \  
           
       # - run:
