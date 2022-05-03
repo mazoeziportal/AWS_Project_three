@@ -318,9 +318,8 @@ jobs:
             apk add --no-cache \
                 python3 \
                 py3-pip \
-            && pip3 install --upgrade pip \
-            && pip3 install ansible-modules-pm2 \
-            && pip3 install awscli 
+            && pip3 install --upgrade pip \ 
+            && pip3 install awscli \
             echo 'aws cli version:'
             aws --version
             sudo apt-get install -y nodejs build-essential
