@@ -364,6 +364,10 @@ jobs:
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
           no_output_timeout: 30m
+      - run:
+          name: Run Tests
+          no_output_timeout: 30m
+          command: python -m unittest
 
       - revert-migrations:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
