@@ -199,7 +199,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
+          fingerprints: ["94:90:43:82:75:2f:b1:f1:69:2e:60:3f:e7:4a:95:5c"]
       - attach_workspace:
           at: ~/
        
@@ -308,7 +308,7 @@ jobs:
     steps:
       - checkout 
       - add_ssh_keys:
-          fingerprints: ["c4:76:d4:08:5b:92:ad:3e:bd:13:34:63:70:be:16:b8"]
+          fingerprints: ["94:90:43:82:75:2f:b1:f1:69:2e:60:3f:e7:4a:95:5c"]
       - attach_workspace:
           at: ~/
  
@@ -400,7 +400,7 @@ jobs:
                 return 1
             fi
 
-            
+
       ##################next checkstart###
 # - run:
 #     name: Backend smoke test.
