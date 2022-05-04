@@ -315,17 +315,29 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible
-            apk add --update tar 
-            apk add --update gzip
-            apk add --update curl nodejs npm
             apk add --no-cache \
-                python3 \
-                py3-pip \
-            && pip3 install --upgrade pip \ 
-            && pip3 install awscli \
-            echo 'aws cli version:'
+            python3 \
+            py3-pip \
+            && pip3 install --upgrade pip \
+            && pip3 install \
+            awscli \
+            && rm -rf /var/cache/apk/*
+            apk add --update ansible curl rsync openssh nodejs npm
+            ansible --version
             aws --version
+
+
+ #           # apk add --update ansible
+ #           # apk add --update tar 
+ #           # apk add --update gzip
+ #           # apk add --update curl nodejs npm
+ #           # apk add --no-cache \
+ #           #     python3 \
+ #           #     py3-pip \
+ #           # && pip3 install --upgrade pip \ 
+ #           # && pip3 install awscli \
+ #           # echo 'aws cli version:'
+ #           # aws --version
  #          -m pip install --upgrade pip
             
       - run:
