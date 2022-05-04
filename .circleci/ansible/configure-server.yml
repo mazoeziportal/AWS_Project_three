@@ -47,7 +47,12 @@
         name: ["nodejs", "npm"]
         state: latest
         update_cache: yes
-        node -v
+
+    - name: "node -v"
+      become: true
+      npm:
+        name: node -v
+        
 
     - name: "install pm2"
       become: true
