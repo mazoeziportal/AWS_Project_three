@@ -15,15 +15,15 @@
         timeout: 600
 
 
-- name: "upgrade packages."
-  become: true
-  apt:
-    upgrade: "yes"
-- name: "install dependencies."
-  become: true
-  apt:
-    name: ["nodejs", "npm"]
-    update_cache: yes
+# - name: "upgrade packages."
+#   become: true
+#   apt:
+#     upgrade: "yes"
+# - name: "install dependencies."
+#   become: true
+#   apt:
+#     name: ["nodejs", "npm"]
+#     update_cache: yes
 
     
   environment:
