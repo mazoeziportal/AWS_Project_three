@@ -208,7 +208,7 @@ jobs:
           command: |
             pip3 install ansible awscli
             sudo apt-get install -y tar gzip
-            node-v
+            
 
  #           apk add --update ansible
  #           apk add --update tar 
