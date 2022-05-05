@@ -10,7 +10,7 @@
   copy: 
     src: /root/project/artifact.tar.gz
     dest: /home/ubuntu/backend/artifact.tar.gz
-    ignore_errors: "{{ ansible_check_mode }}"
+    
 
 - name: unzip backend directory
   become: yes
@@ -222,3 +222,4 @@
  # unarchive:
  #   src: /home/ubuntu/backend/artifact.tar.gz
   #  dest: /home/ubuntu/backend
+ # ignore_errors: "{{ ansible_check_mode }}"
