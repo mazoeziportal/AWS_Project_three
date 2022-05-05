@@ -357,8 +357,9 @@ jobs:
             npm i
             npm run build
             cd ..
-            tar -C backend -czvf artifact.tar.gz .
-            cp artifact.tar.gz /tmp
+            tar -C backend -czvf artifact.tar.gz . 
+            echo pwd
+            echo ls
             cd .circleci/ansible
             echo "Contents of the inventory.txt file are -------"
             cat inventory.txt
@@ -604,7 +605,7 @@ jobs:
       #       echo "API_URL = ${API_URL}"
       #       echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
       #       cat frontend/.env
-
+#            cp artifact.tar.gz
 
 
 

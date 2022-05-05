@@ -5,10 +5,19 @@
     path: /home/ubuntu/backend
     state: directory
 
-- name: copy artifact.tar.gz
-  unarchive:
+- name: copy files to backend
+  become: yes
+  copy: 
     src: /home/circleci/project/artifact.tar.gz
-    dest: /home/ubuntu/backend
+    dest: /home/ubuntu/backend/artifact.tar.gz
+    ignore_errors: "{{ ansible_check_mode }}"
+    
+- name: unzip backend directory
+  become: yes
+  shell: |
+    cd /home/ubuntu/backend
+    tar -vxf artifact.tar.gz
+    rm -f artifact.tar.gz
 
 - name: "upgrade packages."
   become: true
@@ -208,3 +217,8 @@
 #       pm2 stop default
 #       pm2 start npm -- run start
 #   become: True 
+#####
+#- name: unzip artifact.tar.gz
+ # unarchive:
+ #   src: /home/ubuntu/backend/artifact.tar.gz
+  #  dest: /home/ubuntu/backend
