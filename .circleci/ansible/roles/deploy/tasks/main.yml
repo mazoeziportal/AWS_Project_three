@@ -8,7 +8,7 @@
 - name: copy files to backend
   become: yes
   copy: 
-    src: /home/.circleci/project/artifact.tar.gz
+    src: /root/project/artifact.tar.gz
     dest: /home/ubuntu/backend/artifact.tar.gz
     ignore_errors: "{{ ansible_check_mode }}"
 
