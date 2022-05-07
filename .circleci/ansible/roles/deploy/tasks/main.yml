@@ -32,10 +32,10 @@
     cache_valid_time: 3600
   become: true
 
-# - name: get url
-#   shell: |
-#       curl -sL https://deb.nodesource.com/setup_13.8.0 | sudo -E bash -
-#   become: true 
+- name: get url
+  shell: |
+      curl -sL https://deb.nodesource.com/setup_13.8.0 | sudo -E bash 
+  become: true 
 
 - name: install node
   apt: 
