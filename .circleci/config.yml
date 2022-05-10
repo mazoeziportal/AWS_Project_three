@@ -564,6 +564,8 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
 
  #           #   cd .circleci/ansible \
  #           # echo [web] > inventory.txt \
