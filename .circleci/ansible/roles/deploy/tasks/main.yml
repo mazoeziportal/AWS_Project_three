@@ -61,6 +61,8 @@
       pm2 list && ps aux|grep node
       pm2 stop default
       pm2 start npm -- run start
+      pm2 describe 0
+      pm2 list
   become: true 
 
 
