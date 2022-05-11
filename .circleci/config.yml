@@ -296,6 +296,7 @@ jobs:
           name: Deploy frontend objects
           command: |
             cd frontend
+            cat .env
             npm install
             #npm audit fix
             #npm audit fix --force
@@ -448,7 +449,7 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
-              --stack-name InitialStack \
+              --stack-name=InitialStack \
               --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
               --tags project=udapeople
             echo OldWorkflowID: "${OldWorkflowID}"
@@ -477,11 +478,11 @@ jobs:
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
-            else
-              echo "---------Unable to clean------------"
-            fi
-  # would be replaced after one debugg-----------------------
 
+            fi
+# would be replaced after one debugg-----------------------
+#            else
+#             echo "---------Unable to clean------------"
             # export OldWorkflowID=$(aws cloudformation \
             #   list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
             #   --no-paginate --output text)
