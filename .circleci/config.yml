@@ -329,7 +329,6 @@ jobs:
             ansible --version
             aws --version
 
-
  #           # apk add --update ansible
  #           # apk add --update tar 
  #           # apk add --update gzip
@@ -342,6 +341,7 @@ jobs:
  #           # echo 'aws cli version:'
  #           # aws --version
  #          -m pip install --upgrade pip
+ 
             
       - run:
           name: Deploy backend
