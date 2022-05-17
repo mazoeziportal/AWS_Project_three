@@ -711,6 +711,7 @@ workflows:
  #           # --filters "Name=tag:project,Values=udapeople" \
  #           # --output text >> .circleci/ansible/inventory.txt
  #           # cat .circleci/ansible/inventory.txt
+
 ######################################
  #        #  BACKEND_AWS_PUBLIC_IP=$(aws ec2 describe-instances \
  #         #     --filters "Name=tag:Name,Values=backend-prod-${CIRCLE_WORKFLOW_ID}" \
@@ -720,6 +721,7 @@ workflows:
  #         #   echo "$BACKEND_AWS_PUBLIC_IP" >> .circleci/ansible/inventory.txt
  #         #   cat .circleci/outputs/backend_url.txt
  #         #   cat ~/output.txt 
+ 
  ########new solution    
       #  aws cloudformation deploy \
       #           --template-file .circleci/files/cloudfront.yml \
