@@ -208,7 +208,6 @@ jobs:
           command: |
             pip3 install ansible awscli
             sudo apt-get install -y tar gzip
-            
 
  #           apk add --update ansible
  #           apk add --update tar 
@@ -721,7 +720,7 @@ workflows:
  #         #   echo "$BACKEND_AWS_PUBLIC_IP" >> .circleci/ansible/inventory.txt
  #         #   cat .circleci/outputs/backend_url.txt
  #         #   cat ~/output.txt 
- 
+
  ########new solution    
       #  aws cloudformation deploy \
       #           --template-file .circleci/files/cloudfront.yml \
