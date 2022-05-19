@@ -1,4 +1,24 @@
 ---
+- name: "upgrade packages."
+  become: true
+  apt:
+    upgrade: "yes"
+
+- name: "install dependencies."
+  become: true
+  apt:
+    name: ["nodejs", "npm", "unzip"]
+    state: latest
+    update_cache: yes
+
+- name: "install pm2"
+  become: true
+  npm:
+    name: pm2
+    global: yes
+    production: yes
+    state: present
+# new above
 - name: create backend directory on EC2
   become: yes
   file:
@@ -18,66 +38,90 @@
     cd /home/ubuntu/backend
     tar -vxf artifact.tar.gz
     rm -f artifact.tar.gz
-
-- name: "upgrade packages."
-  become: true
-  apt:
-    upgrade: "yes"
-
-- name: install curl
-  apt: 
-    name: 
-      - curl
-    update_cache: yes
-    cache_valid_time: 3600
-  become: true
-
-- name: get url
+# start here
+- name: Install Node 
   shell: |
-      curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
-  become: true 
-
-- name: install node
-  apt: 
-    name: 
-      - nodejs
-    update_cache: yes
-    cache_valid_time: 3600
-  become: true
-
-- name: "install pm2"
-  become: true
-  npm:
-    name: pm2
-    global: yes
-    production: yes
-    state: present
-    # new
+    cd /home/ubuntu/backend
+    npm install
+    
 - name: Build package
   shell: |
     cd /home/ubuntu/backend
     npm run build
     cat .env
     npm run prestart:prod
-    # new
-- name: Start the app
+- name: Start PM2
   shell: |
-      cd /home/ubuntu/backend
-      npm install
-      npm audit fix 
-      pm2 list && ps aux|grep node
-      pm2 stop default
-      pm2 start npm -- run start
-      pm2 describe 0
-      pm2 list
-  become: true
-
+    cd /home/ubuntu/backend
+    pm2 start npm --no-automation --name "backend" -- run start
 - name: start pm2 for dist/main.js
   become: no
   shell: pm2 start main.js
   args:
     chdir: /home/ubuntu/backend/dist
-    
+# end here
+# previous code
+# - name: "upgrade packages."
+#   become: true
+#   apt:
+#     upgrade: "yes"
+
+# - name: install curl
+#   apt: 
+#     name: 
+#       - curl
+#     update_cache: yes
+#     cache_valid_time: 3600
+#   become: true
+
+# - name: get url
+#   shell: |
+#       curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+#   become: true 
+
+# - name: install node
+#   apt: 
+#     name: 
+#       - nodejs
+#     update_cache: yes
+#     cache_valid_time: 3600
+#   become: true
+
+# - name: "install pm2"
+#   become: true
+#   npm:
+#     name: pm2
+#     global: yes
+#     production: yes
+#     state: present
+#     # new
+# - name: Build package
+#   shell: |
+#     cd /home/ubuntu/backend
+#     npm run build
+#     cat .env
+#     npm run prestart:prod
+#     # new
+# - name: Start the app
+#   shell: |
+#       cd /home/ubuntu/backend
+#       npm install
+#       npm audit fix 
+#       pm2 list && ps aux|grep node
+#       pm2 stop default
+#       pm2 start npm -- run start
+#       pm2 describe 0
+#       pm2 list
+#   become: true
+# previous code end
+
+# - name: start pm2 for dist/main.js
+#   become: no
+#   shell: pm2 start main.js
+#   args:
+#     chdir: /home/ubuntu/backend/dist
+
+
 - name: "wait 60 seconds for target connection to become reachable/usable."
   wait_for_connection:
     timeout: 60
