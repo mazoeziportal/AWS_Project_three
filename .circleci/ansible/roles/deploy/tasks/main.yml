@@ -63,6 +63,7 @@
 - name: Start the app
   shell: |
       cd /home/ubuntu/backend
+      npm login
       npm install
       npm audit fix
       npm run build
