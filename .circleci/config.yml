@@ -215,7 +215,7 @@ jobs:
  #           pip install gcc -y
  #           pip3 install ansible awscli
           
-          
+
       - run:
           name: Configure server
           command: |
@@ -297,6 +297,7 @@ jobs:
             yum -y install nodejs
             yum install python3-pip -y
  #           yum install ansible -y
+
 
       - run:
           name: Get backend url
