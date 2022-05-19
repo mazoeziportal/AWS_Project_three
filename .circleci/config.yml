@@ -503,12 +503,14 @@ jobs:
             #   --stack-name InitialStack \
             #   --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" OldWorkflowID="${OldWorkflowID}" \
             #   --tags project=udapeople
+            
+            aws cloudformation update-stack --use-previous-template --stack-name udapeople-cloudfront --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7}
 
-            aws cloudformation update-stack \
-              --use-previous-template \
-              --stack-name "udapeople-cloudfront" \
-              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
-              --tags project=udapeople
+            # aws cloudformation update-stack \
+            #   --template-file .circleci/files/cloudfront.yml \
+            #   --stack-name "udapeople-cloudfront" \
+            #   --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+            #   --tags project=udapeople
 
             #  aws cloudformation deploy \
             #   --template-file .circleci/files/cloudfront.yml \
@@ -577,6 +579,7 @@ jobs:
             # echo $OldWorkflowID >> ~/OldWorkflowID.txt
             # cat ~/OldWorkflowID.txt
 # your code goes here
+# aws cloudformation update-stack --use-previous-template --stack-name cloudfront --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7}
 
 #             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
 #             then
