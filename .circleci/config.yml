@@ -215,6 +215,7 @@ jobs:
  #           pip install gcc -y
  #           pip3 install ansible awscli
           
+          
       - run:
           name: Configure server
           command: |
@@ -227,7 +228,7 @@ jobs:
             echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
             echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
             echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-#           echo NODE_ENV=production >> "backend/.env"
+            # echo NODE_ENV=production >> "backend/.env"
             echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
             echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
