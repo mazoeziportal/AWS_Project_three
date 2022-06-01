@@ -190,12 +190,13 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
 
-      # - destroy-environment:
-      #     workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"     
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"    
+
   
   configure-infrastructure:
     docker:
-      - image: cimg/python:3.9 #python:3.7-alpine3.11
+      - image: cimg/python:3.9 
     steps:
       - checkout
       - add_ssh_keys:
@@ -209,12 +210,6 @@ jobs:
             pip3 install ansible awscli
             sudo apt-get install -y tar gzip
 
- #           apk add --update ansible
- #           apk add --update tar 
- #           apk add --update gzip
- #           pip install gcc -y
- #           pip3 install ansible awscli
-          
 
       - run:
           name: Configure server
@@ -239,8 +234,8 @@ jobs:
             ansible-playbook -i inventory.txt configure-server.yml
           no_output_timeout: 30m
 
-      # - destroy-environment:
-      #     workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
   run-migrations:
     docker:
@@ -249,7 +244,7 @@ jobs:
       - checkout
       - restore_cache:
           keys: [backend-build]
- # code added         
+          
       - run:
          name: Install awscli
          command: |
@@ -272,8 +267,8 @@ jobs:
             then
               curl https://kvdb.io/N4WnpYNLfMTMbwrNZrUZGT/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
-      # - destroy-environment:
-      #     workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
 
   deploy-frontend:
@@ -296,7 +291,7 @@ jobs:
             curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
             yum -y install nodejs
             yum install python3-pip -y
- #           yum install ansible -y
+ 
 
 
       - run:
@@ -326,8 +321,7 @@ jobs:
 
   deploy-backend:
     docker: 
-      - image: python:3.7-alpine3.11 #python:3.9-alpine3.11 ##cimg/python:3.9 #python:3.9-alpine3.11
-      # Docker image here that supports Ansible
+      - image: python:3.7-alpine3.11 
     steps:
       - checkout 
       - add_ssh_keys:
@@ -338,8 +332,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # apk add --update curl nodejs npm ansible zip
-            # pip install awscli
+
             apk add --no-cache \
             python3 \
             py3-pip \
@@ -352,20 +345,6 @@ jobs:
             aws --version
 
 
- #           # apk add --update ansible
- #           # apk add --update tar 
- #           # apk add --update gzip
- #           # apk add --update curl nodejs npm
- #           # apk add --no-cache \
- #           #     python3 \
- #           #     py3-pip \
- #           # && pip3 install --upgrade pip \ 
- #           # && pip3 install awscli \
- #           # echo 'aws cli version:'
- #           # aws --version
- #          -m pip install --upgrade pip
-
-
             
       - run:
           name: Deploy backend
@@ -376,11 +355,6 @@ jobs:
             echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> "backend/.env"
             echo TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> "backend/.env"
             echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> "backend/.env"
-            # echo ENVIRONMENT=production >> "backend/.env"
-            # echo TYPEORM_CONNECTION=postgres >> "backend/.env"
-            # echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-            # echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
-            # echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
             echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
             echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
@@ -403,11 +377,12 @@ jobs:
           no_output_timeout: 30m
           command: python -m unittest
 
-      # - revert-migrations:
-      #     workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
-      # - destroy-environment: 
-      #     workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - destroy-environment: 
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+
+      - revert-migrations:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
   smoke-test:
     docker:
@@ -422,19 +397,6 @@ jobs:
             pip3 install --upgrade pip
             pip3 install awscli
             aws --version
-
-      # - run:
-      #     name: Frontend smoke test.
-      #     command: |
-      #       URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
-      #       echo ${URL} 
-      #       if curl -s ${URL} | grep "Welcome"
-      #       then
-      #         # Change this to 0 after the job fails
-      #         return 0
-      #       else
-      #         return 1
-      #       fi  
 
 
       - run:
@@ -463,17 +425,17 @@ jobs:
             echo ${URL} 
             if curl -s ${URL} | grep "Welcome"
             then
-              # Change this to 0 after the job fails
+              
               return 0
             else
               return 1
             fi
 
-  #     # - destroy-environment:
-  #     #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
             
-  #     # - revert-migrations:
-  #     #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   cloudfront-update:
     docker:
@@ -490,196 +452,45 @@ jobs:
       - run:
           name: Update cloudfront distribution
           command: |
-            # export OldWorkflowID=$(aws cloudformation \
-            #   list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-            #   --no-paginate --output text)
-            # echo $OldWorkflowID >> ~/OldWorkflowID.txt
-            # cat ~/OldWorkflowID.txt
-            # echo OldWorkflowID: "${OldWorkflowID}"
-            # echo Current Workflow Id: "${CIRCLE_WORKFLOW_ID:0:7}"
-        
-            # aws cloudformation deploy \
-            #   --template-file .circleci/files/cloudfront.yml \
-            #   --stack-name InitialStack \
-            #   --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" OldWorkflowID="${OldWorkflowID}" \
-            #   --tags project=udapeople
+
             
-            aws cloudformation update-stack --use-previous-template --stack-name udapeople-cloudfront --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7}
+#           # aws cloudformation update-stack --use-previous-template --stack-name udapeople-cloudfront --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation update-stack \
+              --use-previous-template \
+              --stack-name udapeople-cloudfront \
+              --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7}
+       
 
-            # aws cloudformation update-stack \
-            #   --template-file .circleci/files/cloudfront.yml \
-            #   --stack-name "udapeople-cloudfront" \
-            #   --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
-            #   --tags project=udapeople
-
-            #  aws cloudformation deploy \
-            #   --template-file .circleci/files/cloudfront.yml \
-            #   --template-file .circleci/files/cloudfront.yml
-            #   --stack-name "udapeople-cloudfront-${CIRCLE_WORKFLOW_ID:0:7}" \
-            #   --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
-            #   --tags project=udapeople            
-
-            # aws cloudformation deploy \
-            #   --template-file .circleci/files/cloudfront.yml \
-            #   --stack-name "InitialStack" \
-            #   --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
-            #   --tags project=udapeople            
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
 
-      # - destroy-environment:
-      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      # - revert-migrations:
-      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  cleanup:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout 
+      - run:
+          name: Get old stack workflow id and Remove old stacks and files
+          command: |
+            export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
+            echo OldWorkflowID: "${OldWorkflowID}"
+            echo CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:7}"        
+            export STACKS=$(aws cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter "CREATE_COMPLETE" --no-paginate --output text) 
+            echo Stack names: "${STACKS[@]}"
 
 
-  # cleanup:
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout 
-  #     - run:
-  #         name: Get old stack workflow id and Remove old stacks and files
-  #         command: |
-  #           export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
-  #           echo OldWorkflowID: "${OldWorkflowID}"
-  #           echo CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:7}"        
-  #           export STACKS=$(aws cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter "CREATE_COMPLETE" --no-paginate --output text) 
-  #           echo Stack names: "${STACKS[@]}"
-
-
-  #           # if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-  #           # then  
-  #           #   echo "Stack exist, remove....${OldWorkflowID}"
-  #           #   echo "s3://udapeople-${OldWorkflowID}"
-  #           #   aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-  #           #   aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-  #           #   aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"                            
-  #           # fi
-
-
-  #           if [[ "${OldWorkflowID}" =~ "${CIRCLE_WORKFLOW_ID:0:7}" ]]
-  #           then
-  #             echo "------------I am cleaning the house-------------"
-  #             aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-  #             aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-  #             aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
-  #           else
-  #            echo "---------Unable to clean------------"
-  #           fi
-
-
-
-
-# would be replaced after one debugg-----------------------
-#            else
-#             echo "---------Unable to clean------------"
-            # export OldWorkflowID=$(aws cloudformation \
-            #   list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-            #   --no-paginate --output text)
-            # echo $OldWorkflowID >> ~/OldWorkflowID.txt
-            # cat ~/OldWorkflowID.txt
-# your code goes here
-# aws cloudformation update-stack --use-previous-template --stack-name cloudfront --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7}
-
-#             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-#             then
-#               # your code here
-#               # You can use any condition like:
-#               # if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
-#               # if [[ "${OldWorkflowID}" =~ "${STACKS[@]}"  ]]
-#               if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
-
-#               then
-#               # your code goes here
-#                 echo "I am cleaning the house"
-#                 aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-#                 aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-#                 aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
-
-#               else          
-#                 echo " The house is not clean"
-#               fi
-
-###################
-#             # your code here
-#             export OldWorkflowID="the id here"
-#             export STACKS=[] #put the list of stacks here
-#             # Fetch the Old workflow ID
-#             export OldWorkflowID=$(aws cloudformation \
-#             list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-#             --no-paginate --output text)
-#             echo OldWorkflowID: "${OldWorkflowID}"
-#             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
-#             # Fetch the stack names          
-#             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
-#             --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
-#             echo Stack names: "${STACKS[@]}"
-
-
-
-############################
-
-  # cleanup:
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout 
-  #     - run:
-  #         name: Get old stack workflow id
-  #         command: |
-  #           export OldWorkflowID=$(aws cloudformation \ 
-  #             list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \ 
-  #             --no-paginate --output text)
-  #           echo OldWorkflowID: "${OldWorkflowID}"
-  #           echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"          
-  #           export STACKS=$(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \ 
-  #             --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
-  #           echo Stack names: "${STACKS[@]}"
-
-  #     - run:
-  #         name: Remove old stacks and files
-  #         command: |
-  #           if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
-  #           then
-  #             echo "------------I am cleaning the house-------------"
-  #             aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-  #             aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-  #             aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
-  #           else
-  #             echo "---------Unable to clean------------"
-  #           fi
-
-
-#       ##################next checkstart###
-# # - run:
-# #     name: Backend smoke test.
-# #     command: |
-# #       export BACKEND_URL=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:Name,Values=udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
-# #       echo http://${BACKEND_URL}:3030/api/status
-# #       if 
-# #         curl -s http://${BACKEND_URL}:3030/api/status | grep "ok"
-# #       then
-# #         exit 0
-# #       else
-# #         exit 1
-# #       fi          
-#          export OldWorkflowID=$(aws cloudformation \
-#           list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-#            --no-paginate --output text)
-#          echo $OldWorkflowID >> ~/OldWorkflowID.txt
-#            cat ~/OldWorkflowID.txt
-            
-#         aws cloudformation deploy \
-#         --template-file .circleci/files/cloudfront.yml \
-#         --stack-name "InitialStack-${OldWorkflowID}" \
-#         --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
-#         --tags project=udapeople
-#       # - echo OldWorkflowID: "${OldWorkflowID}"
-#       # - echo Current Workflow Id: "${CIRCLE_WORKFLOW_ID:0:7}"   
-
-#       # Here's where you will add some code to rollback on failure 
-# URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website.us-east-1.amazonaws.com/"
-###############################################above new code###############
+            if [[ "${OldWorkflowID}" =~ "${CIRCLE_WORKFLOW_ID:0:7}" ]]
+            then
+              echo "------------I am cleaning the house-------------"
+              aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+              aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
+              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+            else
+              echo "---------Unable to clean------------"
+            fi
 
 
 workflows:
@@ -715,60 +526,4 @@ workflows:
       # - cleanup:
       #     requires: [cloudfront-update]
 
- #           #   cd .circleci/ansible \
- #           # echo [web] > inventory.txt \
- #           # aws ec2 describe-instances \
- #           # --query 'Reservations[*].Instances[*].PublicIpAddress' \
- #           # --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
- #           # --output text >> inventory.txt 
- #.circleci/ansible/inventory.txt
- # echo [web] > .circleci/ansible/inventory.txt
- #           # aws ec2 describe-instances \
- #          # --query 'Reservations[*].Instances[*].PublicIpAddress' \
- #           # --filters "Name=tag:project,Values=udapeople" \
- #           # --output text >> .circleci/ansible/inventory.txt
- #           # cat .circleci/ansible/inventory.txt
-
-######################################
- #        #  BACKEND_AWS_PUBLIC_IP=$(aws ec2 describe-instances \
- #         #     --filters "Name=tag:Name,Values=backend-prod-${CIRCLE_WORKFLOW_ID}" \
- #         #     --query 'Reservations[*].Instances[*].PublicIpAddress' \
- #         #     --output text)
- #         #   echo "http://$BACKEND_AWS_PUBLIC_IP:3030" > ~/output.txt
- #         #   echo "$BACKEND_AWS_PUBLIC_IP" >> .circleci/ansible/inventory.txt
- #         #   cat .circleci/outputs/backend_url.txt
- #         #   cat ~/output.txt 
-
- ########new solution    
-      #  aws cloudformation deploy \
-      #           --template-file .circleci/files/cloudfront.yml \
-      #           --stack-name InitialStack \
-      #           --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" OldWorkflowID="${OldWorkflowID}" \
-      #           --tags project=udapeople
-
-      #           if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-      #       then
-      #           # your code goes here
-      #           echo "Stack exist, remove....${OldWorkflowID}"
-      #           echo "s3://udapeople-${OldWorkflowID}"
-      #           aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-      #           aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-      #           aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"                            
-      #       fi
-      ####################### new to improving code
-            # echo ENVIROMENT=$ENVIROMENT > .env
-            # echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> .env
-            # echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> .env
-            # echo TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> .env
-            # echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> .env
-            # echo TYPEORM_HOST=$TYPEORM_HOST >> .env
-            # echo TYPEORM_PORT=$TYPEORM_PORT >> .env
-            # echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> .env
-            # echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> .env
-            # echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> .env
-            # npm run migrations > migrations_dump.txt
-
-  #           - name: Create dist directory.
-  # file:
-  #   path: "~/home/ubuntu/backend"
-  #   state: directory
+ 
