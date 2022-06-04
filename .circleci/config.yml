@@ -346,7 +346,6 @@ jobs:
             ansible --version
             aws --version
 
-
             
       - run:
           name: Deploy backend
