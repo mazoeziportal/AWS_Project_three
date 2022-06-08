@@ -1,0 +1,5 @@
+1. Public Url to GitHub repository (not private) [URL01]
+   https://github.com/mazoeziportal/AWS_Project_three.git
+
+2. Public URL for your S3 Bucket (aka, your green candidate front-end) [URL02]
+   https://udapeople-ec13c80.s3.amazonaws.com/index.html
